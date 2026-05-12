@@ -15,8 +15,14 @@ const reportsRoutes = require('./routes/reports');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// CORS FIX
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
 // Middleware
-app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -42,7 +48,7 @@ app.use('/api/purchases', purchaseRoutes);
 app.use('/api/sales', salesRoutes);
 app.use('/api/reports', reportsRoutes);
 
-// Error Handling Middleware
+// Error Handling
 app.use((err, req, res, next) => {
   console.error('Server Error:', err);
 

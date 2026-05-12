@@ -1,4 +1,7 @@
-const API_BASE = "http://localhost:3001/api";
+const API_BASE =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3001/api"
+    : "https://smart-inventory-backend.onrender.com/api";
 
 async function apiCall(endpoint, method = "GET", body = null) {
   try {
@@ -25,11 +28,11 @@ async function apiCall(endpoint, method = "GET", body = null) {
 
   } catch (error) {
     console.error("API Error:", error);
+    alert("Server connection failed");
     throw error;
   }
 }
 
-// REGISTER
 async function register(username, password, email) {
   return await apiCall("/auth/register", "POST", {
     username,
@@ -38,7 +41,6 @@ async function register(username, password, email) {
   });
 }
 
-// LOGIN
 async function login(username, password) {
   return await apiCall("/auth/login", "POST", {
     username,
