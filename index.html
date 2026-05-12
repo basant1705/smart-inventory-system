@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Inventory — Dashboard</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="utils/api.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          animation: {
+            fadeIn: "fadeIn 0.8s ease-in-out",
+            slideUp: "slideUp 0.7s ease",
+            glowPulse: "glowPulse 2s infinite ease-in-out",
+          },
+          keyframes: {
+            fadeIn: { "0%": { opacity: 0 }, "100%": { opacity: 1 } },
+            slideUp: { "0%": { transform: "translateY(12px)", opacity: 0 }, "100%": { transform: "translateY(0)", opacity: 1 } },
+            glowPulse: {
+              "0%,100%": { boxShadow: "0 0 20px rgba(168,85,247,0.4)" },
+              "50%": { boxShadow: "0 0 35px rgba(99,102,241,0.7)" }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .glass { background: rgba(255,255,255,0.45); backdrop-filter: blur(14px); }
+    .dark .glass { background: rgba(30,30,60,0.45); }
+  </style>
+</head>
+
+<body id="pageBody"
+class="bg-[linear-gradient(135deg,#6a11cb,#2575fc)] min-h-screen font-sans transition-all duration-500">
+
+<script>
+/* 🔐 LOGIN PROTECTION */
+if (localStorage.getItem("loggedIn") !== "true") {
+  window.location.href = "login.html";
+}
+</script>
+
+<!-- HEADER -->
+<header class="border-b border-white/20 shadow-xl sticky top-0 z-50 animate-fadeIn">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-white">
+
+    <div class="flex items-center gap-4">
+      <button id="openSidebar" class="md:hidden p-2 rounded-lg hover:bg-white/20">☰</button>
+
+      <div class="flex items-center gap-3">
+        <img src="https://cdn-icons-png.flaticon.com/512/891/891399.png"
+          class="h-10 w-10 rounded-full animate-glowPulse" />
+        <div>
+          <h1 class="font-bold text-xl">Smart Inventory</h1>
+          <p class="text-xs opacity-80">Premium Dashboard</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <input type="search" placeholder="Search..."
+        class="px-4 py-2 w-64 rounded-xl bg-white/20 text-white placeholder-white/70 border border-white/30">
+
+      <button id="themeToggle" class="p-3 bg-white/20 rounded-xl">🌙</button>
+
+      <button id="logoutBtn"
+        class="px-4 py-2 bg-red-600 rounded-xl hover:bg-red-700">
+        Logout
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<div class="flex text-white">
+
+<!-- SIDEBAR -->
+<aside id="sidebar"
+class="w-64 hidden md:block h-[calc(100vh-80px)] p-6 space-y-4 animate-slideUp">
+
+  <nav class="space-y-2 text-sm">
+    <a href="#" class="block p-3 rounded-lg bg-purple-700">🏠 Dashboard</a>
+    <a href="products.html" class="block p-3 rounded-lg hover:bg-white/20">📦 Products</a>
+    <a href="suppliers.html" class="block p-3 rounded-lg hover:bg-white/20">🤝 Suppliers</a>
+    <a href="purchases.html" class="block p-3 rounded-lg hover:bg-white/20">🧾 Purchases</a>
+    <a href="sales.html" class="block p-3 rounded-lg hover:bg-white/20">💳 Sales</a>
+    <a href="reports.html" class="block p-3 rounded-lg hover:bg-white/20">📊 Reports</a>
+    <a href="settings.html" class="block p-3 rounded-lg hover:bg-white/20">⚙ Settings</a>
+  </nav>
+
+</aside>
+
+<!-- MAIN -->
+<main class="flex-1 p-8">
+
+  <!-- CARDS -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+    <div class="p-6 rounded-2xl bg-white/10">
+      <p>Total Products</p>
+      <h2 class="text-3xl font-bold">1248</h2>
+    </div>
+
+    <div class="p-6 rounded-2xl bg-white/10">
+      <p>Stock Value</p>
+      <h2 class="text-3xl font-bold">₹ 3,245,600</h2>
+    </div>
+
+    <div class="p-6 rounded-2xl bg-white/10">
+      <p>Low Stock</p>
+      <h2 class="text-3xl font-bold text-red-300">12</h2>
+    </div>
+
+  </section>
+
+  <!-- ALERTS -->
+  <section class="p-6 rounded-2xl bg-white/10">
+    <h3 class="font-bold mb-4">Alerts</h3>
+
+    <ul class="space-y-3 text-sm">
+
+      <li class="flex justify-between bg-white/20 p-3 rounded-xl">
+        Milk Powder - Expiring
+        <button onclick="goPO('Milk Powder')" class="px-3 py-1 bg-white/20 rounded-xl">PO</button>
+      </li>
+
+      <li class="flex justify-between bg-white/20 p-3 rounded-xl">
+        AA Batteries - Low Stock
+        <button onclick="goPO('AA Batteries')" class="px-3 py-1 bg-white/20 rounded-xl">Order</button>
+      </li>
+
+    </ul>
+  </section>
+
+</main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+/* LOGOUT */
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  logout();
+});
+
+/* THEME */
+const body = document.getElementById("pageBody");
+const themeBtn = document.getElementById("themeToggle");
+
+if (localStorage.getItem("theme") === "dark") {
+  body.classList.add("dark");
+  themeBtn.textContent = "☀️";
+}
+
+themeBtn.addEventListener("click", () => {
+  body.classList.toggle("dark");
+
+  if (body.classList.contains("dark")) {
+    localStorage.setItem("theme", "dark");
+    themeBtn.textContent = "☀️";
+  } else {
+    localStorage.setItem("theme", "light");
+    themeBtn.textContent = "🌙";
+  }
+});
+
+/* PO REDIRECT */
+function goPO(item){
+  window.location.href = "purchases.html?item=" + encodeURIComponent(item);
+}
+
+</script>
+
+</body>
+</html>

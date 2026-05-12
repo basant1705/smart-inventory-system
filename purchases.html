@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purchases - Smart Inventory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body id="pageBody" class="bg-[linear-gradient(135deg,#6a11cb,#2575fc)] from-purple-500 via-indigo-500 to-blue-600 dark:from-indigo-900 dark:via-purple-900 dark:to-blue-900 min-h-screen font-sans transition-all duration-500"> 
+
+    <!-- Navbar -->
+    <nav class="bg-blue-600 text-white p-4 shadow">
+        <h1 class="text-xl font-bold">Smart Inventory Management System</h1>
+    </nav>
+
+    <div class="flex">
+        
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <div class="bg-blue-400 p-6 rounded shadow">
+                <h2 class="text-2xl font-bold mb-4">Purchase Entry</h2>
+
+                <!-- Supplier Info -->
+                <div class="bg-blue-400 p-4 rounded border mb-6">
+                    <h3 class="text-lg font-semibold mb-3">Supplier Details</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input id="supplierName" class="border p-2 rounded" placeholder="Supplier Name" />
+                        <input id="invoiceNo" class="border p-2 rounded" placeholder="Invoice No" />
+                        <input id="purchaseDate" type="date" class="border p-2 rounded" />
+                    </div>
+                </div>
+
+                <!-- Add Product To Purchase -->
+                <div class="bg-blue-400 p-4 rounded border mb-6">
+                    <h3 class="text-lg font-semibold mb-3">Add Product</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
+                        <input id="pName" class="border p-2 rounded" placeholder="Product Name" />
+                        <input id="pQty" type="number" min="1" class="border p-2 rounded" placeholder="Qty" />
+                        <input id="pCost" type="number" min="0" class="border p-2 rounded" placeholder="Unit Cost" />
+                        <button onclick="addPurchaseItem()" class="bg-blue-600 text-white px-4 py-2 rounded">Add</button>
+                    </div>
+                </div>
+
+                <!-- Purchase Table -->
+                <table class="w-full bg-white shadow rounded overflow-hidden mb-6">
+                    <thead class="bg-blue-600 text-white">
+                        <tr>
+                            <th class="p-2">#</th>
+                            <th class="p-2">Product</th>
+                            <th class="p-2">Qty</th>
+                            <th class="p-2">Cost</th>
+                            <th class="p-2">Total</th>
+                            <th class="p-2">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchaseTable"></tbody>
+                </table>
+
+                <div class="flex justify-end text-xl font-bold">
+                    <p>Grand Total: ₹ <span id="purchaseTotal">0</span></p>
+                </div>
+
+                <div class="flex justify-end mt-6">
+                    <button onclick="savePurchase()" class="bg-green-600 text-white px-6 py-2 rounded shadow">Save Purchase</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let purchaseItems = [];
+
+        function addPurchaseItem() {
+            const name = document.getElementById("pName").value;
+            const qty = parseInt(document.getElementById("pQty").value);
+            const cost = parseFloat(document.getElementById("pCost").value);
+
+            if (!name || qty < 1 || cost <= 0) {
+                alert("Enter valid product details!");
+                return;
+            }
+
+            const total = qty * cost;
+            purchaseItems.push({ name, qty, cost, total });
+            renderPurchaseTable();
+        }
+
+        function renderPurchaseTable() {
+            const table = document.getElementById("purchaseTable");
+            table.innerHTML = "";
+            let grand = 0;
+
+            purchaseItems.forEach((item, i) => {
+                grand += item.total;
+                table.innerHTML += `
+                <tr class="border-b">
+                    <td class="p-2 text-center">${i + 1}</td>
+                    <td class="p-2">${item.name}</td>
+                    <td class="p-2 text-center">${item.qty}</td>
+                    <td class="p-2 text-center">₹${item.cost}</td>
+                    <td class="p-2 text-center">₹${item.total}</td>
+                    <td class="p-2 text-center">
+                        <button onclick="removePurchase(${i})" class="text-red-600">Delete</button>
+                    </td>
+                </tr>`;
+            });
+
+            document.getElementById("purchaseTotal").innerText = grand;
+        }
+
+        function removePurchase(index) {
+            purchaseItems.splice(index, 1);
+            renderPurchaseTable();
+        }
+
+        function savePurchase() {
+            if (purchaseItems.length === 0) {
+                alert("No items added!");
+                return;
+            }
+            alert("Purchase saved successfully! (Database integration can be added.)");
+        }
+    </script>
+</body>
+</html>

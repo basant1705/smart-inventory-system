@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Inventory — Suppliers</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .card { 
+      border-radius: 20px; 
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.25);
+      box-shadow: 0 8px 30px rgba(90, 40, 200, 0.2);
+    }
+    .input {
+      border-radius: 12px;
+      background: rgba(255,255,255,0.4);
+    }
+    body {
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+    }
+    .header-title {
+      background: linear-gradient(to right, #ffffff, #dcdcff);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .btn-main {
+      background: linear-gradient(135deg, #8e2de2, #4a00e0);
+    }
+    .btn-main:hover {
+      background: linear-gradient(135deg, #9f3df0, #5c10f0);
+    }
+    .btn-edit {
+      background: #6366f1;
+    }
+    .btn-delete {
+      background: #ef4444;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen p-0 text-white font-sans">
+
+<div class="flex">
+
+  <!-- ⭐ SIDEBAR -->
+  
+  <!-- ⭐ MAIN CONTENT -->
+  <div class="flex-1 p-6">
+
+    <div class="max-w-5xl mx-auto">
+      <h1 class="text-4xl font-extrabold mb-6 header-title drop-shadow-lg">👥 Supplier Management</h1>
+
+      <!-- Add Supplier -->
+      <div class="card p-6 mb-10">
+        <h2 class="text-2xl font-semibold mb-4">➕ Add New Supplier</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div>
+            <label class="text-sm ">Supplier Name</label>
+            <input id="supName" class="input w-full p-2 border mt-1" placeholder="Enter name" />
+          </div>
+
+          <div>
+            <label class="text-sm ">Phone</label>
+            <input id="supPhone" class="input w-full p-2 border mt-1" placeholder="Enter number" />
+          </div>
+
+          <div>
+            <label class="text-sm ">Address</label>
+            <input id="supAddress" class="input w-full p-2 border mt-1" placeholder="Enter address" />
+          </div>
+        </div>
+
+        <button onclick="addSupplier()" class="mt-5 px-6 py-3 text-white rounded-xl btn-main shadow-lg transition">
+          Add Supplier
+        </button>
+      </div>
+
+      <!-- Supplier List -->
+      <div class="card p-6">
+        <div class="flex justify-between items-center mb-5">
+          <h2 class="text-2xl font-semibold">📋 Supplier List</h2>
+          <input id="searchSup" class="input border px-4 py-2 text-black rounded-lg" placeholder="Search supplier..." />
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-white">
+            <thead>
+              <tr class="bg-white bg-opacity-10 text-left border-b border-white border-opacity-20">
+                <th class="p-3">Name</th>
+                <th class="p-3">Phone</th>
+                <th class="p-3">Address</th>
+                <th class="p-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="supTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+let suppliers = [];
+
+function renderSuppliers() {
+  const tbody = document.getElementById('supTable');
+  const search = document.getElementById('searchSup').value.toLowerCase();
+
+  tbody.innerHTML = suppliers
+    .filter(s => s.name.toLowerCase().includes(search))
+    .map((s, i) => `
+      <tr class="border-t border-white border-opacity-20 hover:bg-white/10 transition">
+        <td class="p-3">${s.name}</td>
+        <td class="p-3">${s.phone}</td>
+        <td class="p-3">${s.address}</td>
+        <td class="p-3 text-center space-x-2">
+          <button onclick="editSupplier(${i})" class="px-3 py-2 rounded-lg btn-edit text-white shadow-md">Edit</button>
+          <button onclick="deleteSupplier(${i})" class="px-3 py-2 rounded-lg btn-delete text-white shadow-md">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+}
+
+function addSupplier() {
+  const name = document.getElementById('supName').value.trim();
+  const phone = document.getElementById('supPhone').value.trim();
+  const address = document.getElementById('supAddress').value.trim();
+
+  if (!name || !phone || !address) return alert('Please fill all fields');
+
+  suppliers.push({ name, phone, address });
+  renderSuppliers();
+
+  document.getElementById('supName').value = '';
+  document.getElementById('supPhone').value = '';
+  document.getElementById('supAddress').value = '';
+
+  alert('Supplier added successfully!');
+}
+
+function editSupplier(i) {
+  const s = suppliers[i];
+  const newName = prompt('Edit Name:', s.name);
+  const newPhone = prompt('Edit Phone:', s.phone);
+  const newAddress = prompt('Edit Address:', s.address);
+
+  if (newName && newPhone && newAddress) {
+    suppliers[i] = { name: newName, phone: newPhone, address: newAddress };
+    renderSuppliers();
+  }
+}
+
+function deleteSupplier(i) {
+  if (confirm('Delete this supplier?')) {
+    suppliers.splice(i, 1);
+    renderSuppliers();
+  }
+}
+
+document.getElementById('searchSup').addEventListener('input', renderSuppliers);
+</script>
+
+</body>
+</html>

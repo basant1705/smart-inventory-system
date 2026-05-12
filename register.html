@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-700 to-cyan-500">
+
+  <div class="bg-white/20 p-8 rounded-xl w-96 backdrop-blur-xl border border-white/30 text-white">
+
+    <h2 class="text-2xl font-bold text-center mb-6">Create Account</h2>
+
+    <input id="newUser" type="text" placeholder="Username"
+      class="w-full mb-4 p-3 rounded bg-white/10 border border-white/30">
+
+    <input id="newEmail" type="email" placeholder="Email"
+      class="w-full mb-4 p-3 rounded bg-white/10 border border-white/30">
+
+    <input id="newPass" type="password" placeholder="Password"
+      class="w-full mb-4 p-3 rounded bg-white/10 border border-white/30">
+
+    <input id="confirmPass" type="password" placeholder="Confirm Password"
+      class="w-full mb-4 p-3 rounded bg-white/10 border border-white/30">
+
+    <button onclick="registerUser()"
+      class="w-full bg-cyan-300 text-black font-bold py-2 rounded hover:bg-cyan-200">
+      Register
+    </button>
+
+    <p class="text-center mt-4 text-sm">
+      Already have an account?
+      <a href="login.html" class="text-cyan-200 underline">Login</a>
+    </p>
+
+  </div>
+
+  <script src="utils/api.js"></script>
+  <script>
+    async function registerUser() {
+      const user = document.getElementById("newUser").value.trim();
+      const email = document.getElementById("newEmail").value.trim();
+      const pass = document.getElementById("newPass").value.trim();
+      const confirmPass = document.getElementById("confirmPass").value.trim();
+
+      if (!user || !email || !pass || !confirmPass) {
+        alert("Fill all fields!");
+        return;
+      }
+
+      if (pass !== confirmPass) {
+        alert("Passwords do not match!");
+        return;
+      }
+
+      if (pass.length < 6) {
+        alert("Password should be at least 6 characters long!");
+        return;
+      }
+
+      const result = await register(user, pass, email);
+      if (result && result.userId) {
+        alert("✅ Registration successful! Please login.");
+        window.location.href = "login.html";
+      } else {
+        alert("❌ Registration failed! Username may already exist.");
+      }
+    }
+
+    // Allow Enter key to register
+    document.getElementById("confirmPass").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        registerUser();
+      }
+    });
+  </script>
+
+</body>
+</html> update

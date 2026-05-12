@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate Bill</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-gradient min-h-screen p-6 text-slate-800">
+
+  <div class="max-w-3xl mx-auto bg-white p-6 rounded-2xl shadow-xl">
+    <h1 class="text-3xl font-bold text-center mb-6">🧾 Generate Bill</h1>
+
+    <!-- ITEM FORM -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <input id="itemName" type="text" placeholder="Item Name" class="input-box">
+      <input id="itemQty" type="number" placeholder="Qty" class="input-box">
+      <input id="itemPrice" type="number" placeholder="Price" class="input-box">
+    </div>
+
+    <button onclick="addItem()" class="btn btn-primary w-full mb-6">
+      ➕ Add Item
+    </button>
+
+    <!-- BILL TABLE -->
+    <div class="overflow-x-auto">
+      <table class="w-full border rounded-lg">
+        <thead class="bg-blue-600 text-white">
+          <tr>
+            <th class="p-3 text-left">Item</th>
+            <th class="p-3 text-left">Qty</th>
+            <th class="p-3 text-left">Price</th>
+            <th class="p-3 text-left">Total</th>
+            <th class="p-3 text-left">Remove</th>
+          </tr>
+        </thead>
+        <tbody id="billBody" class="divide-y"></tbody>
+      </table>
+    </div>
+
+    <!-- TOTAL SECTION -->
+    <div class="mt-6 text-right">
+      <p class="text-lg">Subtotal: ₹ <span id="subTotal">0</span></p>
+      <p class="text-lg">GST (18%): ₹ <span id="gst">0</span></p>
+      <p class="text-2xl font-bold">Grand Total: ₹ <span id="grandTotal">0</span></p>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="mt-8 flex flex-wrap gap-4">
+      <button onclick="printBill()" class="btn btn-success">
+        🖨 Print Bill
+      </button>
+      <button onclick="resetBill()" class="btn btn-danger">
+        🔄 Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- External JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Inventory — Products</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .card { 
+      border-radius: 20px; 
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.25);
+      box-shadow: 0 8px 30px rgba(90, 40, 200, 0.2);
+    }
+    .input {
+      border-radius: 12px;
+      background: rgba(255,255,255,0.4);
+    }
+    body {
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+    }
+    .header-title {
+      background: linear-gradient(to right, #ffffff, #dcdcff);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .btn-main {
+      background: linear-gradient(135deg, #8e2de2, #4a00e0);
+    }
+    .btn-main:hover {
+      background: linear-gradient(135deg, #9f3df0, #5c10f0);
+    }
+    .btn-edit {
+      background: #6366f1;
+    }
+    .btn-delete {
+      background: #ef4444;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen p-0 text-white font-sans">
+
+<div class="flex">
+
+
+
+  <!-- ⭐ MAIN CONTENT -->
+  <div class="flex-1 p-6">
+
+    <div class="max-w-5xl mx-auto">
+      <h1 class="text-4xl font-extrabold mb-6 header-title drop-shadow-lg">📦 Product Management</h1>
+
+      <!-- Add Product -->
+      <div class="card p-6 mb-10">
+        <h2 class="text-2xl font-semibold mb-4">➕ Add New Product</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div>
+            <label class="text-sm">Product Name</label>
+            <input id="prodName" class="input w-full p-2 border mt-1" placeholder="Enter product" />
+          </div>
+
+          <div>
+            <label class="text-sm">Price</label>
+            <input id="prodPrice" type="number" class="input w-full p-2 border mt-1" placeholder="Enter price" />
+          </div>
+
+          <div>
+            <label class="text-sm">Stock</label>
+            <input id="prodStock" type="number" class="input w-full p-2 border mt-1" placeholder="Enter stock qty" />
+          </div>
+        </div>
+
+        <button onclick="addProduct()" class="mt-5 px-6 py-3 text-white rounded-xl btn-main shadow-lg transition">
+          Add Product
+        </button>
+      </div>
+
+      <!-- Product List -->
+      <div class="card p-6">
+        <div class="flex justify-between items-center mb-5">
+          <h2 class="text-2xl font-semibold">📋 Product List</h2>
+          <input id="searchProd" class="input border px-4 py-2 text-black rounded-lg" placeholder="Search product..." />
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-white">
+            <thead>
+              <tr class="bg-white bg-opacity-10 text-left border-b border-white border-opacity-20">
+                <th class="p-3">Product</th>
+                <th class="p-3">Price (₹)</th>
+                <th class="p-3">Stock</th>
+                <th class="p-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="prodTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+let products = [];
+
+function renderProducts() {
+  const tbody = document.getElementById('prodTable');
+  const search = document.getElementById('searchProd').value.toLowerCase();
+
+  tbody.innerHTML = products
+    .filter(p => p.name.toLowerCase().includes(search))
+    .map((p, i) => `
+      <tr class="border-t border-white border-opacity-20 hover:bg-white/10 transition">
+        <td class="p-3">${p.name}</td>
+        <td class="p-3">₹${p.price}</td>
+        <td class="p-3">${p.stock}</td>
+        <td class="p-3 text-center space-x-2">
+          <button onclick="editProduct(${i})" class="px-3 py-2 rounded-lg btn-edit text-white shadow-md">Edit</button>
+          <button onclick="deleteProduct(${i})" class="px-3 py-2 rounded-lg btn-delete text-white shadow-md">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+}
+
+function addProduct() {
+  const name = document.getElementById('prodName').value.trim();
+  const price = document.getElementById('prodPrice').value.trim();
+  const stock = document.getElementById('prodStock').value.trim();
+
+  if (!name || !price || !stock) return alert('Please fill all fields');
+
+  products.push({ name, price, stock });
+  renderProducts();
+
+  document.getElementById('prodName').value = '';
+  document.getElementById('prodPrice').value = '';
+  document.getElementById('prodStock').value = '';
+
+  alert('Product added successfully!');
+}
+
+function editProduct(i) {
+  const p = products[i];
+  const newName = prompt('Edit Product Name:', p.name);
+  const newPrice = prompt('Edit Price:', p.price);
+  const newStock = prompt('Edit Stock:', p.stock);
+
+  if (newName && newPrice && newStock) {
+    products[i] = { name: newName, price: newPrice, stock: newStock };
+    renderProducts();
+  }
+}
+
+function deleteProduct(i) {
+  if (confirm('Delete this product?')) {
+    products.splice(i, 1);
+    renderProducts();
+  }
+}
+
+document.getElementById('searchProd').addEventListener('input', renderProducts);
+</script>
+
+</body>
+</html>

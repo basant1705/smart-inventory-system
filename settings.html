@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Advanced Settings - Smart Inventory System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary-blue: #3b82f6;
+        --primary-purple: #8b5cf6;
+        --primary-green: #10b981;
+    }
+
+    body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background: #2f149c;
+        transition: 0.3s ease-in-out;
+    }
+
+    body.dark {
+        background: #1f1f2e;
+        color: #fff;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+        width: 240px;
+        height: 100vh;
+        background: #2f149c;
+        position: fixed;
+        color: white;
+        padding: 20px;
+    }
+
+    .sidebar h2 {
+        margin-bottom: 25px;
+    }
+
+    .sidebar a {
+        display: block;
+        padding: 12px 10px;
+        margin: 6px 0;
+        background: #353757;
+        text-decoration: none;
+        border-radius: 8px;
+        color: white;
+    }
+
+    /* MAIN CONTENT */
+    .main {
+        margin-left: 260px;
+        padding: 25px;
+    }
+
+    .card {
+        background: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: 0.3s;
+    }
+    body.dark .card { background: #2e3148; }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    /* INPUTS */
+    input, select {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        margin-bottom: 12px;
+    }
+
+    body.dark input, body.dark select {
+        background: #3a3c55;
+        color: white;
+        border: 1px solid #555;
+    }
+
+    /* TOGGLE SWITCH */
+    .toggle {
+        position: relative;
+        width: 45px;
+        height: 22px;
+    }
+    .toggle input { display: none; }
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        background: #ccc;
+        border-radius: 22px;
+        top: 0; left: 0;
+        right: 0; bottom: 0;
+        transition: 0.4s;
+    }
+    .slider:before {
+        content: "";
+        position: absolute;
+        height: 18px; width: 18px;
+        border-radius: 50%;
+        background: white;
+        transition: 0.4s;
+        top: 2px; left: 2px;
+    }
+    input:checked + .slider {
+        background: var(--primary-purple);
+    }
+    input:checked + .slider:before {
+        transform: translateX(22px);
+    }
+
+    /* PROFILE IMAGE */
+    .profile-img {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--primary-blue);
+    }
+
+    /* SAVE BUTTON */
+    .save-btn {
+        width: 100%;
+        padding: 15px;
+        background: var(--primary-green);
+        color: white;
+        font-size: 16px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>⚙ Settings</h2>
+    <a href="#">Profile</a>
+    <a href="#">Notifications</a>
+    <a href="#">System</a>
+    <a href="#">Users</a>
+    <a href="#">Backup</a>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+    <h1>Advanced System Settings</h1>
+
+    <!-- PROFILE SETTINGS -->
+    <div class="card">
+        <div class="card-title">👤 Profile Settings</div>
+
+        <img src="https://via.placeholder.com/90" id="profilePreview" class="profile-img"><br><br>
+
+        <label>Upload Profile Photo</label>
+        <input type="file" id="profilePic" onchange="previewPhoto()">
+
+        <label>Name</label>
+        <input type="text" id="name">
+
+        <label>Email</label>
+        <input type="email" id="email">
+    </div>
+
+    <!-- PASSWORD CHANGE -->
+    <div class="card">
+        <div class="card-title">🔐 Change Password</div>
+
+        <label>Old Password</label>
+        <input type="password" id="oldPass">
+
+        <label>New Password</label>
+        <input type="password" id="newPass">
+
+        <label>Confirm Password</label>
+        <input type="password" id="confirmPass">
+    </div>
+
+    <!-- NOTIFICATION SETTINGS -->
+    <div class="card">
+        <div class="card-title">🔔 Notification Settings</div>
+
+        Low Stock Alerts
+        <label class="toggle">
+            <input type="checkbox" id="lowStockAlert">
+            <span class="slider"></span>
+        </label>
+
+        Expiry Alerts
+        <label class="toggle">
+            <input type="checkbox" id="expiryAlert">
+            <span class="slider"></span>
+        </label>
+
+        High Demand Alerts
+        <label class="toggle">
+            <input type="checkbox" id="demandAlert">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <!-- THEME SETTINGS -->
+    <div class="card">
+        <div class="card-title">🎨 Display & Themes</div>
+
+        <label>Select Theme Color</label>
+        <select id="themeColor">
+            <option value="blue">Blue</option>
+            <option value="purple">Purple</option>
+            <option value="green">Green</option>
+        </select>
+
+        <label>Theme Mode</label>
+        <select id="themeMode" onchange="applyMode()">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+        </select>
+
+        <label>Language</label>
+        <select id="language">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+        </select>
+    </div>
+
+    <!-- USER MANAGEMENT -->
+    <div class="card">
+        <div class="card-title">👥 User Roles</div>
+
+        <label>User Role</label>
+        <select id="userRole">
+            <option value="admin">Admin</option>
+            <option value="manager">Manager</option>
+            <option value="staff">Staff</option>
+        </select>
+    </div>
+
+    <!-- BACKUP & RESTORE -->
+    <div class="card">
+        <div class="card-title">💾 Backup & Restore</div>
+
+        <button onclick="exportSettings()">Export Settings (JSON)</button><br><br>
+
+        <input type="file" id="importFile" onchange="importSettings()">
+    </div>
+
+    <!-- SAVE BUTTON -->
+    <button class="save-btn" onclick="saveSettings()">Save All Settings</button>
+
+</div>
+
+<script>
+/* PROFILE PHOTO PREVIEW */
+function previewPhoto() {
+    const file = document.getElementById("profilePic").files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+        document.getElementById("profilePreview").src = reader.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+/* LOAD SETTINGS */
+window.onload = function () {
+    const s = JSON.parse(localStorage.getItem("settings")) || {};
+
+    document.getElementById("name").value = s.name || "";
+    document.getElementById("email").value = s.email || "";
+    document.getElementById("lowStockAlert").checked = s.lowStockAlert || false;
+    document.getElementById("expiryAlert").checked = s.expiryAlert || false;
+    document.getElementById("demandAlert").checked = s.demandAlert || false;
+    document.getElementById("themeMode").value = s.themeMode || "light";
+    document.getElementById("themeColor").value = s.themeColor || "blue";
+    document.getElementById("userRole").value = s.userRole || "admin";
+    document.getElementById("language").value = s.language || "en";
+
+    if (s.profilePic) document.getElementById("profilePreview").src = s.profilePic;
+
+    applyMode();
+};
+
+/* APPLY DARK/LIGHT MODE */
+function applyMode() {
+    let mode = document.getElementById("themeMode").value;
+    document.body.classList.toggle("dark", mode === "dark");
+}
+
+/* SAVE SETTINGS */
+function saveSettings() {
+    const settings = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        lowStockAlert: document.getElementById("lowStockAlert").checked,
+        expiryAlert: document.getElementById("expiryAlert").checked,
+        demandAlert: document.getElementById("demandAlert").checked,
+        themeMode: document.getElementById("themeMode").value,
+        themeColor: document.getElementById("themeColor").value,
+        language: document.getElementById("language").value,
+        userRole: document.getElementById("userRole").value,
+        profilePic: document.getElementById("profilePreview").src
+    };
+
+    localStorage.setItem("settings", JSON.stringify(settings));
+
+    alert("Settings saved successfully!");
+}
+
+/* EXPORT SETTINGS */
+function exportSettings() {
+    let data = localStorage.getItem("settings");
+    let blob = new Blob([data], { type: "application/json" });
+    let url = URL.createObjectURL(blob);
+
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "settings_backup.json";
+    a.click();
+}
+
+/* IMPORT SETTINGS */
+function importSettings() {
+    let file = document.getElementById("importFile").files[0];
+    let reader = new FileReader();
+
+    reader.onload = function (e) {
+        localStorage.setItem("settings", e.target.result);
+        alert("Settings imported! Refresh page.");
+        location.reload();
+    };
+
+    reader.readAsText(file);
+}
+</script>
+
+</body>
+</html>

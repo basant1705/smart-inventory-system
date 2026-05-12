@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales - Smart Inventory</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- QR Code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- API -->
+    <script src="utils/api.js"></script>
+</head>
+
+<body class="bg-[linear-gradient(135deg,#6a11cb,#2575fc)] min-h-screen p-6 text-white">
+
+<!-- SHOP HEADER -->
+<div class="text-center mb-8">
+    <h1 class="text-4xl font-bold">Smart Inventory Billing</h1>
+    
+</div>
+
+<div class="max-w-4xl mx-auto bg-blue-400 text-black p-6 rounded-xl shadow-xl">
+
+    <!-- CUSTOMER DETAILS -->
+    <h2 class="text-2xl font-bold mb-4">Customer Details</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <input id="customerName" class="border p-2 rounded" placeholder="Customer Name">
+        <input id="customerPhone" class="border p-2 rounded" placeholder="Phone Number">
+        <input id="billDate" type="date" class="border p-2 rounded">
+    </div>
+
+    <!-- PRODUCT INPUT -->
+    <h2 class="text-2xl font-bold mb-4">Add Products</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        <input id="productName" class="border p-2 rounded" placeholder="Product Name">
+        <input id="productQty" type="number" class="border p-2 rounded" placeholder="Qty" min="1">
+        <input id="productPrice" type="number" class="border p-2 rounded" placeholder="Unit Price" min="0">
+        <button onclick="addItem()" class="bg-blue-600 text-white px-4 py-2 rounded">Add</button>
+    </div>
+
+    <!-- BILL TABLE -->
+    <table class="w-full bg-white border rounded">
+        <thead class="bg-blue-600 text-white">
+            <tr>
+                <th class="p-2">#</th>
+                <th class="p-2">Product</th>
+                <th class="p-2">Qty</th>
+                <th class="p-2">Price</th>
+                <th class="p-2">Total</th>
+                <th class="p-2">Action</th>
+            </tr>
+        </thead>
+        <tbody id="billTable"></tbody>
+    </table>
+
+    <!-- DISCOUNT + GST -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+
+        <div>
+            <label class="font-semibold">Discount (%)</label>
+            <input id="discount" type="number" min="0" max="100"
+                   class="border p-2 rounded w-full" placeholder="0">
+        </div>
+
+        <div>
+            <label class="font-semibold">GST (18%)</label>
+            <input id="gst" type="text" disabled
+                   class="border p-2 rounded w-full bg-gray-200">
+        </div>
+
+        <div>
+            <label class="font-semibold">Grand Total</label>
+            <input id="grandTotal" disabled
+                   class="border p-2 rounded w-full bg-gray-200">
+        </div>
+
+    </div>
+
+    <!-- QR & PDF -->
+    <div class="flex justify-between mt-8">
+        <div>
+            <h3 class="font-bold mb-2">Invoice QR Code</h3>
+            <div id="qrcode"></div>
+        </div>
+
+        <button onclick="generatePDF()"
+                class="bg-green-600 text-white px-6 py-2 rounded shadow">
+            Download PDF
+        </button>
+    </div>
+
+</div>
+
+<script>
+let billItems = [];
+
+// ADD ITEM
+function addItem() {
+    const name = productName.value;
+    const qty = parseInt(productQty.value);
+    const price = parseFloat(productPrice.value);
+
+    if (!name || qty < 1 || price <= 0) {
+        alert("Enter valid product details!");
+        return;
+    }
+
+    const total = qty * price;
+    billItems.push({ name, qty, price, total });
+
+    renderTable();
+}
+
+// RENDER TABLE
+function renderTable() {
+    billTable.innerHTML = "";
+    let subtotal = 0;
+
+    billItems.forEach((item, i) => {
+        subtotal += item.total;
+
+        billTable.innerHTML += `
+        <tr class="border-b">
+            <td class="p-2 text-center">${i + 1}</td>
+            <td class="p-2">${item.name}</td>
+            <td class="p-2 text-center">${item.qty}</td>
+            <td class="p-2 text-center">₹${item.price}</td>
+            <td class="p-2 text-center">₹${item.total}</td>
+            <td class="p-2 text-center">
+                <button onclick="removeItem(${i})" class="text-red-500">Delete</button>
+            </td>
+        </tr>`;
+    });
+
+    updateTotals(subtotal);
+}
+
+function removeItem(i) {
+    billItems.splice(i, 1);
+    renderTable();
+}
+
+// UPDATE TOTALS
+function updateTotals(subtotal) {
+    const discountPercent = parseFloat(discount.value) || 0;
+    const discountAmount = subtotal * (discountPercent / 100);
+
+    const afterDiscount = subtotal - discountAmount;
+    const gstAmount = afterDiscount * 0.18;
+
+    grandTotal.value = (afterDiscount + gstAmount).toFixed(2);
+    gst.value = gstAmount.toFixed(2);
+
+    generateQR();
+}
+
+// QR CODE
+function generateQR() {
+    const qrDiv = document.getElementById("qrcode");
+    qrDiv.innerHTML = "";
+
+    new QRCode(qrDiv, {
+        text: `Total: ₹${grandTotal.value}`,
+        width: 100,
+        height: 100
+    });
+}
+
+// PDF GENERATION
+async function generatePDF() {
+    const element = document.body;
+
+    const canvas = await html2canvas(element);
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jspdf.jsPDF("p", "mm", "a4");
+    const width = pdf.internal.pageSize.getWidth();
+
+    pdf.addImage(imgData, "PNG", 0, 0, width, 0);
+    pdf.save("Invoice.pdf");
+}
+
+</script>
+
+</body>
+</html>
