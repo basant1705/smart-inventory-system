@@ -1,10 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
 require('dotenv').config();
 
+// Database
 const db = require('./database/db');
 
+// Routes
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const supplierRoutes = require('./routes/suppliers');
@@ -13,34 +16,51 @@ const salesRoutes = require('./routes/sales');
 const reportsRoutes = require('./routes/reports');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
-// CORS FIX
+// PORT
+const PORT = process.env.PORT || 5001;
+
+// ==========================
+// Middleware
+// ==========================
+
+// CORS
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
 
-// Middleware
+// Body Parser
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Home Route
+// ==========================
+// Static Frontend Files
+// ==========================
+
+// Serve all frontend files from root folder
+app.use(express.static(__dirname));
+
+// ==========================
+// Routes
+// ==========================
+
+// Homepage
 app.get('/', (req, res) => {
-  res.send('✅ Smart Inventory Backend Running Successfully');
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// API Health Check
+// Health API
 app.get('/api/health', (req, res) => {
-  res.json({
+  res.status(200).json({
     success: true,
     message: 'Backend is running!'
   });
 });
 
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/suppliers', supplierRoutes);
@@ -48,9 +68,23 @@ app.use('/api/purchases', purchaseRoutes);
 app.use('/api/sales', salesRoutes);
 app.use('/api/reports', reportsRoutes);
 
-// Error Handling
+// ==========================
+// 404 Handler
+// ==========================
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route not found'
+  });
+});
+
+// ==========================
+// Global Error Handler
+// ==========================
+
 app.use((err, req, res, next) => {
-  console.error('Server Error:', err);
+  console.error('❌ Server Error:', err);
 
   res.status(500).json({
     success: false,
@@ -58,9 +92,12 @@ app.use((err, req, res, next) => {
   });
 });
 
+// ==========================
 // Start Server
+// ==========================
+
 app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
 
 module.exports = app;

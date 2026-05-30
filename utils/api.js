@@ -1,6 +1,6 @@
 const API_BASE =
   window.location.hostname === "localhost"
-    ? "http://localhost:3001/api"
+    ? "http://localhost:5000/api"
     : "https://smart-inventory-backend.onrender.com/api";
 
 async function apiCall(endpoint, method = "GET", body = null) {
@@ -46,4 +46,48 @@ async function login(username, password) {
     username,
     password,
   });
+}
+
+async function getProducts() {
+  return await apiCall("/products");
+}
+
+async function addProduct(productData) {
+  return await apiCall("/products", "POST", productData);
+}
+
+async function updateProduct(id, productData) {
+  return await apiCall(`/products/${id}`, "PUT", productData);
+}
+
+async function deleteProduct(id) {
+  return await apiCall(`/products/${id}`, "DELETE");
+}
+
+async function getSuppliers() {
+  return await apiCall("/suppliers");
+}
+
+async function addSupplier(supplierData) {
+  return await apiCall("/suppliers", "POST", supplierData);
+}
+
+async function getPurchases() {
+  return await apiCall("/purchases");
+}
+
+async function addPurchase(purchaseData) {
+  return await apiCall("/purchases", "POST", purchaseData);
+}
+
+async function getSales() {
+  return await apiCall("/sales");
+}
+
+async function addSale(saleData) {
+  return await apiCall("/sales", "POST", saleData);
+}
+
+async function getReports() {
+  return await apiCall("/reports");
 }

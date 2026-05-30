@@ -40,7 +40,6 @@
 class="bg-[linear-gradient(135deg,#6a11cb,#2575fc)] min-h-screen font-sans transition-all duration-500">
 
 <script>
-/* 🔐 LOGIN PROTECTION */
 if (localStorage.getItem("loggedIn") !== "true") {
   window.location.href = "login.html";
 }
@@ -102,19 +101,19 @@ class="w-64 hidden md:block h-[calc(100vh-80px)] p-6 space-y-4 animate-slideUp">
   <!-- CARDS -->
   <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
-    <div class="p-6 rounded-2xl bg-white/10">
+    <div class="p-6 rounded-2xl bg-white/10 hover:scale-105 transition">
       <p>Total Products</p>
-      <h2 class="text-3xl font-bold">1248</h2>
+      <h2 id="totalProducts" class="text-3xl font-bold">0</h2>
     </div>
 
-    <div class="p-6 rounded-2xl bg-white/10">
+    <div class="p-6 rounded-2xl bg-white/10 hover:scale-105 transition">
       <p>Stock Value</p>
       <h2 class="text-3xl font-bold">₹ 3,245,600</h2>
     </div>
 
-    <div class="p-6 rounded-2xl bg-white/10">
+    <div class="p-6 rounded-2xl bg-white/10 hover:scale-105 transition">
       <p>Low Stock</p>
-      <h2 class="text-3xl font-bold text-red-300">12</h2>
+      <h2 id="lowStock" class="text-3xl font-bold text-red-300">0</h2>
     </div>
 
   </section>
@@ -123,31 +122,19 @@ class="w-64 hidden md:block h-[calc(100vh-80px)] p-6 space-y-4 animate-slideUp">
   <section class="p-6 rounded-2xl bg-white/10">
     <h3 class="font-bold mb-4">Alerts</h3>
 
-    <ul class="space-y-3 text-sm">
-
-      <li class="flex justify-between bg-white/20 p-3 rounded-xl">
-        Milk Powder - Expiring
-        <button onclick="goPO('Milk Powder')" class="px-3 py-1 bg-white/20 rounded-xl">PO</button>
-      </li>
-
-      <li class="flex justify-between bg-white/20 p-3 rounded-xl">
-        AA Batteries - Low Stock
-        <button onclick="goPO('AA Batteries')" class="px-3 py-1 bg-white/20 rounded-xl">Order</button>
-      </li>
-
-    </ul>
+    <ul id="alertBox" class="space-y-3 text-sm"></ul>
   </section>
 
 </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
 
 /* LOGOUT */
 document.getElementById("logoutBtn").addEventListener("click", () => {
-  logout();
+  localStorage.removeItem("loggedIn");
+  localStorage.removeItem("username");
+  window.location.href = "login.html";
 });
 
 /* THEME */
@@ -171,10 +158,66 @@ themeBtn.addEventListener("click", () => {
   }
 });
 
-/* PO REDIRECT */
+/* REDIRECT PO */
 function goPO(item){
   window.location.href = "purchases.html?item=" + encodeURIComponent(item);
 }
+
+/* DATA */
+let products = JSON.parse(localStorage.getItem("products") || JSON.stringify([
+  { name: "Milk Powder", stock: 5 },
+  { name: "AA Batteries", stock: 2 },
+  { name: "Rice Bag", stock: 50 },
+  { name: "Sugar", stock: 8 }
+]));
+
+/* UPDATE STATS */
+function updateStats(){
+  document.getElementById("totalProducts").innerText = products.length;
+
+  const low = products.filter(p => p.stock < 10).length;
+  document.getElementById("lowStock").innerText = low;
+}
+
+/* ALERTS */
+function updateAlerts(){
+  const box = document.getElementById("alertBox");
+  box.innerHTML = "";
+
+  products.forEach(p => {
+    if(p.stock < 10){
+      box.innerHTML += `
+        <li class="flex justify-between bg-white/20 p-3 rounded-xl">
+          ${p.name} - Low Stock
+          <button onclick="goPO('${p.name}')"
+            class="px-3 py-1 bg-white/20 rounded-xl">Order</button>
+        </li>
+      `;
+    }
+  });
+}
+
+/* SEARCH */
+document.querySelector('input[type="search"]').addEventListener("input", (e)=>{
+  const val = e.target.value.toLowerCase();
+
+  document.querySelectorAll("#alertBox li").forEach(li=>{
+    li.style.display = li.innerText.toLowerCase().includes(val)
+      ? "flex"
+      : "none";
+  });
+});
+
+/* INIT */
+updateStats();
+updateAlerts();
+
+/* AUTO SYNC */
+setInterval(()=>{
+  localStorage.setItem("products", JSON.stringify(products));
+  updateStats();
+  updateAlerts();
+}, 4000);
 
 </script>
 
