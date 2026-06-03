@@ -9,7 +9,7 @@ const db = require('./database/db');
 
 const app = express();
 
-// PORT
+// PORT (Render requirement)
 const PORT = process.env.PORT || 5001;
 
 // ==========================
@@ -59,8 +59,6 @@ const supplierRoutes = require('./routes/suppliers');
 const purchaseRoutes = require('./routes/purchases');
 const salesRoutes = require('./routes/sales');
 const reportsRoutes = require('./routes/reports');
-
-// ✅ ADD SHORTEN ROUTE (FIX FOR YOUR ERROR)
 const shortenRoutes = require('./routes/shorten');
 
 // ==========================
@@ -73,12 +71,10 @@ app.use('/api/suppliers', supplierRoutes);
 app.use('/api/purchases', purchaseRoutes);
 app.use('/api/sales', salesRoutes);
 app.use('/api/reports', reportsRoutes);
-
-// ✅ NEW ROUTE ADDED
 app.use('/api/shorten', shortenRoutes);
 
 // ==========================
-// 404 Handler (LAST)
+// 404 Handler
 // ==========================
 
 app.use((req, res) => {
@@ -102,11 +98,11 @@ app.use((err, req, res, next) => {
 });
 
 // ==========================
-// Start Server
+// START SERVER (FIXED FOR RENDER)
 // ==========================
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
 
 module.exports = app;
