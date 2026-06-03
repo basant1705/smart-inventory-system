@@ -1,49 +1,45 @@
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const path = require('path');
 require('dotenv').config();
 
-// Database
-const db = require('./database/db');
+// IMPORTANT: initialize DB first
+require('./database/db');
 
 const app = express();
 
 // PORT (Render requirement)
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 
 // ==========================
-// Middleware
+// MIDDLEWARE
 // ==========================
 
 app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
+  origin: '*'
 }));
 
 app.use(express.json());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 // ==========================
-// Static Files
+// STATIC FRONTEND
 // ==========================
 
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname)));
 
 // ==========================
-// Routes
+// ROUTES
 // ==========================
 
-// Homepage
+// Home
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Health check
+// Health check (IMPORTANT)
 app.get('/api/health', (req, res) => {
-  res.status(200).json({
+  res.json({
     success: true,
     message: 'Backend is running!'
   });
@@ -74,7 +70,7 @@ app.use('/api/reports', reportsRoutes);
 app.use('/api/shorten', shortenRoutes);
 
 // ==========================
-// 404 Handler
+// 404 HANDLER
 // ==========================
 
 app.use((req, res) => {
@@ -85,7 +81,7 @@ app.use((req, res) => {
 });
 
 // ==========================
-// Global Error Handler
+// GLOBAL ERROR HANDLER
 // ==========================
 
 app.use((err, req, res, next) => {
@@ -98,11 +94,9 @@ app.use((err, req, res, next) => {
 });
 
 // ==========================
-// START SERVER (FIXED FOR RENDER)
+// START SERVER (RENDER SAFE)
 // ==========================
 
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-
-module.exports = app;
