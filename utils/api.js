@@ -1,7 +1,4 @@
-const API_BASE =
-  window.location.hostname === "localhost"
-    ? "http://localhost:5000/api"
-    : "https://smart-inventory-system-3r09.onrender.com/api";
+const API_BASE = "https://smart-inventory-system-3r09.onrender.com/api";
 
 // ==========================
 // GENERIC API CALL
