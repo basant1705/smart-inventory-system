@@ -7,14 +7,6 @@ require('dotenv').config();
 // Database
 const db = require('./database/db');
 
-// Routes
-const authRoutes = require('./routes/auth');
-const productRoutes = require('./routes/products');
-const supplierRoutes = require('./routes/suppliers');
-const purchaseRoutes = require('./routes/purchases');
-const salesRoutes = require('./routes/sales');
-const reportsRoutes = require('./routes/reports');
-
 const app = express();
 
 // PORT
@@ -24,23 +16,20 @@ const PORT = process.env.PORT || 5001;
 // Middleware
 // ==========================
 
-// CORS
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
 
-// Body Parser
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // ==========================
-// Static Frontend Files
+// Static Files
 // ==========================
 
-// Serve all frontend files from root folder
 app.use(express.static(__dirname));
 
 // ==========================
@@ -52,7 +41,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Health API
+// Health check
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     success: true,
@@ -60,7 +49,24 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// API Routes
+// ==========================
+// IMPORT ROUTES
+// ==========================
+
+const authRoutes = require('./routes/auth');
+const productRoutes = require('./routes/products');
+const supplierRoutes = require('./routes/suppliers');
+const purchaseRoutes = require('./routes/purchases');
+const salesRoutes = require('./routes/sales');
+const reportsRoutes = require('./routes/reports');
+
+// ✅ ADD SHORTEN ROUTE (FIX FOR YOUR ERROR)
+const shortenRoutes = require('./routes/shorten');
+
+// ==========================
+// USE ROUTES
+// ==========================
+
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/suppliers', supplierRoutes);
@@ -68,8 +74,11 @@ app.use('/api/purchases', purchaseRoutes);
 app.use('/api/sales', salesRoutes);
 app.use('/api/reports', reportsRoutes);
 
+// ✅ NEW ROUTE ADDED
+app.use('/api/shorten', shortenRoutes);
+
 // ==========================
-// 404 Handler
+// 404 Handler (LAST)
 // ==========================
 
 app.use((req, res) => {
